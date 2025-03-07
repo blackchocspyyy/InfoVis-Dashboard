@@ -120,7 +120,7 @@ elif vis_type == "Map":
 
     # Function to style each province
     def style_function(feature):
-        province_name = feature["properties"]["name"]
+        province_name = feature["properties"].get("Province", None)  # Ensure proper key
         pop = df[df["Province"] == province_name]["Population"].values[0] if province_name in df["Province"].values else None
         return {
             "fillColor": colormap(np.log1p(pop)) if pop else "gray",
@@ -128,6 +128,7 @@ elif vis_type == "Map":
             "weight": 1,
             "fillOpacity": 0.7
         }
+
 
     # Add GeoJson for provinces with interactivity
     for _, row in canada_map.iterrows():
