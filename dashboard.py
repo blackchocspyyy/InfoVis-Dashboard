@@ -36,9 +36,9 @@ canada_map = load_canada_map()
 # ----------------- Define Colorblind-Friendly Palettes -----------------
 colorblind_palettes = {
     "Normal Vision": px.colors.qualitative.Set1,
+    "Color Universal Design (CUD): For General Colorblindness": ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"],
     "Deuteranopia: For Red-Green Colorblindness": px.colors.sequential.Viridis,
     "Tritanopia: For Blue-Yellow Colorblindness": px.colors.sequential.Magma,
-    "Color Universal Design (CUD): For General Colorblindness": ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"],
     "Tol Muted: Muted/Soft Colors": ["#332288", "#88CCEE", "#44AA99", "#117733", "#999933", "#DDCC77", "#CC6677", "#882255", "#AA4499"],
 }
 
