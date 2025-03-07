@@ -117,6 +117,7 @@ elif vis_type == "Map":
         vmin=np.log1p(min_pop),  # Log scale to smooth differences
         vmax=np.log1p(max_pop)
     )
+    print("GeoJSON Structure:", canada_map.iloc[0])
 
     # Function to style each province
     def style_function(feature):
