@@ -106,7 +106,7 @@ elif vis_type == "Map":
                 "fillColor": colormap(pop) if pop else "gray",
                 "color": "black",
                 "weight": 1,
-                "fillOpacity": 0.7
+                "fillOpacity": 0.9
             },
             tooltip=f"{row['Province']}: {row['Population']:,}" if pop else "No Data",
         ).add_to(m)
