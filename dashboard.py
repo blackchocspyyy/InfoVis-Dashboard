@@ -93,8 +93,7 @@ elif vis_type == "Map":
     # Create a Folium map with layer control
     m = folium.Map(location=[56.1304, -106.3468], zoom_start=4, tiles=None)
 
-
-    # Add different base layers with proper attribution
+    # Add different base layers
     folium.TileLayer("OpenStreetMap", name="OpenStreetMap").add_to(m)
     folium.TileLayer("CartoDB positron", name="Light Mode").add_to(m)
     folium.TileLayer("CartoDB dark_matter", name="Dark Mode").add_to(m)
@@ -110,50 +109,41 @@ elif vis_type == "Map":
     # Merge data for coloring the provinces
     canada_map = canada_map.rename(columns={"name": "Province"}).merge(df, on="Province", how="left")
 
-    # Apply logarithmic scaling to prevent extreme brightness differences
+    # Create a color mapping based on population
     min_pop, max_pop = df["Population"].min(), df["Population"].max()
-    colormap = folium.LinearColormap(
-        colors=palette_hex,
-        vmin=np.log1p(min_pop),  # Log scale to smooth differences
-        vmax=np.log1p(max_pop)
-    )
-    print("GeoJSON Structure:", canada_map.iloc[0])
-
-    # Function to style each province
-    def style_function(feature):
-        # Directly get the province name from the feature (not "properties")
-        province_name = feature.get("Province", None)  
-
-        # Find matching population data
-        pop = df[df["Province"] == province_name]["Population"].values[0] if province_name in df["Province"].values else None
-        
-        return {
-            "fillColor": colormap(np.log1p(pop)) if pop else "gray",
-            "color": "black",
-            "weight": 1,
-            "fillOpacity": 0.7
-        }
-
-
+    colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
 
     # Add GeoJson for provinces with interactivity
     for _, row in canada_map.iterrows():
         pop = row["Population"] if pd.notna(row["Population"]) else None
+        
         folium.GeoJson(
             row.geometry,
             name=row["Province"],
-            style_function=style_function,
+            style_function=lambda feature, pop=pop: {
+                "fillColor": colormap(pop) if pop else "gray",
+                "color": "black",
+                "weight": 1,
+                "fillOpacity": 0.7
+            },
             highlight_function=lambda x: {"weight": 3, "fillOpacity": 1},  # Hover effect
-            tooltip=f"{row['Province']}: {row['Population']:,}" if pop else "No Data",
-            popup=folium.Popup(f"<b>{row['Province']}</b><br>Population: {row['Population']:,}", max_width=200)
+            tooltip=folium.Tooltip(
+                f"<b>{row['Province']}</b><br>Population: {row['Population']:,}" if pop else "No Data",
+                sticky=True
+            ),
+            popup=folium.Popup(
+                f"<b>{row['Province']}</b><br>Population: {row['Population']:,}",
+                max_width=250
+            )
         ).add_to(m)
 
-    # Add legend with the selected colorblind palette
+    # Add legend with colorblind-friendly palette label
     colormap.caption = f"Population Density ({palette_choice})"
     m.add_child(colormap)
 
     # Render the map in Streamlit
     folium_static(m)
+
 
 elif vis_type == "Table":
     # Hide index and unnecessary columns
