@@ -50,12 +50,8 @@ vis_type = st.sidebar.selectbox("Choose a visualization type:", ["Bar Chart", "M
 palette_choice = st.sidebar.selectbox("Choose a colorblind-friendly palette:", list(colorblind_palettes.keys()))
 palette = colorblind_palettes[palette_choice]
 
-# Convert Plotly color names to hex codes
-palette_hex = [to_hex(px.colors.hex_to_rgb(c)) for c in palette]
-
-# Create a color mapping based on population
-min_pop, max_pop = df["Population"].min(), df["Population"].max()
-colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
+# Convert Plotly colors to HEX (Fix for Folium)
+palette_hex = [to_hex([v / 255 for v in px.colors.hex_to_rgb(c)]) for c in palette]
 
 # ----------------- Visualization Logic -----------------
 if vis_type == "Bar Chart":
@@ -69,10 +65,6 @@ elif vis_type == "Map":
 
     # Merge data for coloring the provinces
     canada_map = canada_map.rename(columns={"name": "Province"}).merge(df, on="Province", how="left")
-
-    # Convert Plotly color names to hex
-    from matplotlib.colors import to_hex
-    palette_hex = [to_hex(px.colors.hex_to_rgb(c)) for c in palette]
 
     # Create a color mapping based on population
     min_pop, max_pop = df["Population"].min(), df["Population"].max()
@@ -95,13 +87,7 @@ elif vis_type == "Map":
 
     folium_static(m)
 
-
 elif vis_type == "Table":
     # Hide index and unnecessary columns
     table_df = df.drop(columns=["Latitude", "Longitude"])
-    
-    # Display table
     st.write(table_df.set_index("Province"))
-
-
-
