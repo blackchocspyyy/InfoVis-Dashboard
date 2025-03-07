@@ -66,26 +66,40 @@ elif vis_type == "Map":
     # Merge data for coloring the provinces
     canada_map = canada_map.rename(columns={"name": "Province"}).merge(df, on="Province", how="left")
 
-    # Create a color mapping based on population
-    min_pop, max_pop = df["Population"].min(), df["Population"].max()
-    colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
+    # Sort data to ensure color mapping is ordered correctly
+    sorted_df = df.sort_values(by="Population")
+    sorted_population = sorted_df["Population"].tolist()
+
+    # Ensure color scale aligns with sorted population
+    from matplotlib.colors import to_hex
+    palette_hex = [to_hex([v / 255 for v in px.colors.hex_to_rgb(c)]) for c in palette]
+    
+    # Make sure the number of colors matches the number of unique population values
+    num_colors = min(len(palette_hex), len(sorted_population))
+    colormap = folium.LinearColormap(
+        colors=palette_hex[:num_colors], 
+        vmin=min(sorted_population), 
+        vmax=max(sorted_population)
+    )
 
     for _, row in canada_map.iterrows():
+        pop = row["Population"] if pd.notna(row["Population"]) else None
         folium.GeoJson(
             row.geometry,
-            style_function=lambda feature, pop=row["Population"]: {
+            style_function=lambda feature, pop=pop: {
                 "fillColor": colormap(pop) if pop else "gray",
                 "color": "black",
                 "weight": 1,
                 "fillOpacity": 0.7
             },
-            tooltip=f"{row['Province']}: {row['Population']:,}",
+            tooltip=f"{row['Province']}: {row['Population']:,}" if pop else "No Data",
         ).add_to(m)
 
     colormap.caption = "Population Density"
     m.add_child(colormap)
 
     folium_static(m)
+
 
 elif vis_type == "Table":
     # Hide index and unnecessary columns
