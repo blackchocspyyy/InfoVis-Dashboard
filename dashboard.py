@@ -4,7 +4,7 @@ import geopandas as gpd
 import plotly.express as px
 import folium
 from streamlit_folium import folium_static
-from matplotlib.colors import to_hex
+from matplotlib.colors import is_color_like, to_hex, to_rgba
 
 
 # ----------------- Load Canada Provinces Data -----------------
