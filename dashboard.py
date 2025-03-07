@@ -93,11 +93,16 @@ elif vis_type == "Map":
     # Create a Folium map with layer control
     m = folium.Map(location=[56.1304, -106.3468], zoom_start=4, tiles=None)
 
-    # Add different base layers
+
+    # Add different base layers with proper attribution
     folium.TileLayer("OpenStreetMap", name="OpenStreetMap").add_to(m)
     folium.TileLayer("CartoDB positron", name="Light Mode").add_to(m)
     folium.TileLayer("CartoDB dark_matter", name="Dark Mode").add_to(m)
-    folium.TileLayer("Stamen Terrain", name="Terrain").add_to(m)
+    folium.TileLayer(
+        tiles="Stamen Terrain",
+        name="Terrain",
+        attr="Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap"
+    ).add_to(m)
 
     # Enable layer control toggle
     folium.LayerControl().add_to(m)
