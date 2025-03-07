@@ -50,19 +50,19 @@ vis_type = st.sidebar.selectbox("Choose a visualization type:", ["Bar Chart", "M
 palette_choice = st.sidebar.selectbox("Choose a colorblind-friendly palette:", list(colorblind_palettes.keys()))
 palette = colorblind_palettes[palette_choice]
 
-# Convert Plotly colors to HEX (Fix for Folium)
-
-# Function to ensure colors are properly converted to hex
+# Function to handle color conversion (RGB or Hex)
 def convert_to_hex(color_list):
     hex_colors = []
     for c in color_list:
-        if isinstance(c, tuple):  # If RGB tuple, convert to hex
+        if isinstance(c, tuple):  # If RGB tuple (e.g., (0, 255, 0))
             hex_colors.append(to_hex([v / 255 for v in c]))
-        else:  # If already a hex string, use directly
+        elif isinstance(c, str) and c.startswith("#"):  # If it's already a hex string (e.g., #00FF00)
             hex_colors.append(c)
+        else:
+            raise ValueError(f"Unexpected color format: {c}")
     return hex_colors
 
-# Convert selected palette to hex codes
+# Convert the selected color palette to hex
 palette_hex = convert_to_hex(palette)
 
 # ----------------- Visualization Logic -----------------
@@ -78,21 +78,9 @@ elif vis_type == "Map":
     # Merge data for coloring the provinces
     canada_map = canada_map.rename(columns={"name": "Province"}).merge(df, on="Province", how="left")
 
-    # Sort data to ensure color mapping is ordered correctly
-    sorted_df = df.sort_values(by="Population")
-    sorted_population = sorted_df["Population"].tolist()
-
-    # Ensure color scale aligns with sorted population
-    from matplotlib.colors import to_hex
-    palette_hex = [to_hex([v / 255 for v in px.colors.hex_to_rgb(c)]) for c in palette]
-    
-    # Make sure the number of colors matches the number of unique population values
-    num_colors = min(len(palette_hex), len(sorted_population))
-    colormap = folium.LinearColormap(
-        colors=palette_hex[:num_colors], 
-        vmin=min(sorted_population), 
-        vmax=max(sorted_population)
-    )
+    # Create a color mapping based on population
+    min_pop, max_pop = df["Population"].min(), df["Population"].max()
+    colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
 
     for _, row in canada_map.iterrows():
         pop = row["Population"] if pd.notna(row["Population"]) else None
@@ -112,8 +100,8 @@ elif vis_type == "Map":
 
     folium_static(m)
 
-
 elif vis_type == "Table":
     # Hide index and unnecessary columns
     table_df = df.drop(columns=["Latitude", "Longitude"])
     st.write(table_df.set_index("Province"))
+
