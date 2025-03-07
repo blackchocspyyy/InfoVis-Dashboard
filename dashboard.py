@@ -130,6 +130,9 @@ elif vis_type == "Map":
     colormap.caption = f"Population Density ({palette_choice})"
     m.add_child(colormap)
 
+    # Display the map
+    folium_static(m)
+
 
 elif vis_type == "Table":
     # Hide index and unnecessary columns
