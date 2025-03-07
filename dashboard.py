@@ -51,7 +51,19 @@ palette_choice = st.sidebar.selectbox("Choose a colorblind-friendly palette:", l
 palette = colorblind_palettes[palette_choice]
 
 # Convert Plotly colors to HEX (Fix for Folium)
-palette_hex = [to_hex([v / 255 for v in px.colors.hex_to_rgb(c)]) for c in palette]
+
+# Function to ensure colors are properly converted to hex
+def convert_to_hex(color_list):
+    hex_colors = []
+    for c in color_list:
+        if isinstance(c, tuple):  # If RGB tuple, convert to hex
+            hex_colors.append(to_hex([v / 255 for v in c]))
+        else:  # If already a hex string, use directly
+            hex_colors.append(c)
+    return hex_colors
+
+# Convert selected palette to hex codes
+palette_hex = convert_to_hex(palette)
 
 # ----------------- Visualization Logic -----------------
 if vis_type == "Bar Chart":
