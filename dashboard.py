@@ -4,6 +4,15 @@ import geopandas as gpd
 import plotly.express as px
 import folium
 from streamlit_folium import folium_static
+from matplotlib.colors import to_hex
+
+# Convert Plotly color names to hex codes
+palette_hex = [to_hex(px.colors.hex_to_rgb(c)) for c in palette]
+
+# Create a color mapping based on population
+min_pop, max_pop = df["Population"].min(), df["Population"].max()
+colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
+
 
 # ----------------- Load Canada Provinces Data -----------------
 # Sample Data: Population and Coordinates for Canadian Provinces
@@ -61,9 +70,13 @@ elif vis_type == "Map":
     # Merge data for coloring the provinces
     canada_map = canada_map.rename(columns={"name": "Province"}).merge(df, on="Province", how="left")
 
+    # Convert Plotly color names to hex
+    from matplotlib.colors import to_hex
+    palette_hex = [to_hex(px.colors.hex_to_rgb(c)) for c in palette]
+
     # Create a color mapping based on population
     min_pop, max_pop = df["Population"].min(), df["Population"].max()
-    colormap = folium.LinearColormap(colors=palette, vmin=min_pop, vmax=max_pop)
+    colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
 
     for _, row in canada_map.iterrows():
         folium.GeoJson(
@@ -82,7 +95,13 @@ elif vis_type == "Map":
 
     folium_static(m)
 
+
 elif vis_type == "Table":
-    st.write(df)
+    # Hide index and unnecessary columns
+    table_df = df.drop(columns=["Latitude", "Longitude"])
+    
+    # Display table
+    st.write(table_df.set_index("Province"))
+
 
 

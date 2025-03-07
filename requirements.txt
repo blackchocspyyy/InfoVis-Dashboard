@@ -5,3 +5,4 @@ folium
 branca
 streamlit_folium
 geopandas
+matplotlib
