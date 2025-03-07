@@ -89,22 +89,10 @@ if vis_type == "Bar Chart":
                  color_discrete_sequence=palette, title="Population by Province")
     st.plotly_chart(fig)
 
+
 elif vis_type == "Map":
     # Create a Folium map
     m = folium.Map(location=[56.1304, -106.3468], zoom_start=4)
-    
-    # Add different base layers
-    folium.TileLayer("OpenStreetMap", name="OpenStreetMap").add_to(m)
-    folium.TileLayer("CartoDB positron", name="Light Mode").add_to(m)
-    folium.TileLayer("CartoDB dark_matter", name="Dark Mode").add_to(m)
-    folium.TileLayer(
-        tiles="Stamen Terrain",
-        name="Terrain",
-        attr="Map tiles by Stamen Design, CC BY 3.0 — Map data © OpenStreetMap"
-    ).add_to(m)
-
-    # Enable layer control toggle
-    folium.LayerControl().add_to(m)
 
     # Merge data for coloring the provinces
     canada_map = canada_map.rename(columns={"name": "Province"}).merge(df, on="Province", how="left")
