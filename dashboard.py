@@ -90,9 +90,9 @@ if vis_type == "Bar Chart":
     st.plotly_chart(fig)
 
 elif vis_type == "Map":
-    # Create a Folium map with layer control
-    m = folium.Map(location=[56.1304, -106.3468], zoom_start=4, tiles=None)
-
+    # Create a Folium map
+    m = folium.Map(location=[56.1304, -106.3468], zoom_start=4)
+    
     # Add different base layers
     folium.TileLayer("OpenStreetMap", name="OpenStreetMap").add_to(m)
     folium.TileLayer("CartoDB positron", name="Light Mode").add_to(m)
@@ -113,36 +113,22 @@ elif vis_type == "Map":
     min_pop, max_pop = df["Population"].min(), df["Population"].max()
     colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
 
-    # Add GeoJson for provinces with interactivity
     for _, row in canada_map.iterrows():
         pop = row["Population"] if pd.notna(row["Population"]) else None
-        
         folium.GeoJson(
             row.geometry,
-            name=row["Province"],
             style_function=lambda feature, pop=pop: {
                 "fillColor": colormap(pop) if pop else "gray",
                 "color": "black",
                 "weight": 1,
                 "fillOpacity": 0.7
             },
-            highlight_function=lambda x: {"weight": 3, "fillOpacity": 1},  # Hover effect
-            tooltip=folium.Tooltip(
-                f"<b>{row['Province']}</b><br>Population: {row['Population']:,}" if pop else "No Data",
-                sticky=True
-            ),
-            popup=folium.Popup(
-                f"<b>{row['Province']}</b><br>Population: {row['Population']:,}",
-                max_width=250
-            )
+            tooltip=f"{row['Province']}: {row['Population']:,}" if pop else "No Data",
         ).add_to(m)
 
     # Add legend with colorblind-friendly palette label
     colormap.caption = f"Population Density ({palette_choice})"
     m.add_child(colormap)
-
-    # Render the map in Streamlit
-    folium_static(m)
 
 
 elif vis_type == "Table":
