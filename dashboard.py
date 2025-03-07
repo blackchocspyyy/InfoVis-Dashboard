@@ -35,12 +35,14 @@ canada_map = load_canada_map()
 
 # ----------------- Define Colorblind-Friendly Palettes -----------------
 colorblind_palettes = {
-    "Normal Vision": px.colors.qualitative.Set1,
-    "Color Universal Design (CUD): For General Colorblindness": ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"],
-    "Deuteranopia: For Red-Green Colorblindness": px.colors.sequential.Viridis,
-    "Tritanopia: For Blue-Yellow Colorblindness": px.colors.sequential.Magma,
-    "Tol Muted: Muted/Soft Colors": ["#332288", "#88CCEE", "#44AA99", "#117733", "#999933", "#DDCC77", "#CC6677", "#882255", "#AA4499"],
+    "Normal Vision (Categorical)": px.colors.qualitative.Set1,  # Bright distinct colors for normal vision users
+    "Color Universal Design (CUD): For General Colorblindness": ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"],  # Colorblind-safe categorical colors
+    "Deuteranopia (Red-Green Colorblindness)": px.colors.sequential.Viridis,  # Blue → Green → Yellow (Best for red-green blindness)
+    "Protanopia (Red-Green Colorblindness)": px.colors.sequential.Cividis,  # Blue → Gray → Yellow (More accessible than Viridis)
+    "Tritanopia (Blue-Yellow Colorblindness)": px.colors.sequential.Magma,  # Black → Dark Red → Yellow (Good for tritanopia)
+    "Soft Contrast (For Accessibility)": px.colors.sequential.Plasma,  # Purple → Orange → Yellow (High contrast, readable for all)
 }
+
 
 
 # ----------------- Streamlit UI -----------------
