@@ -6,6 +6,7 @@ import folium
 from streamlit_folium import folium_static
 from matplotlib.colors import is_color_like, to_hex, to_rgba
 import re
+import numpy as np
 
 
 # ----------------- Load Canada Provinces Data -----------------
@@ -37,15 +38,20 @@ colorblind_palettes = {
     "Normal Vision": px.colors.qualitative.Set1,
     "Deuteranopia (Red-Green)": px.colors.sequential.Viridis,
     "Protanopia (Red-Green)": px.colors.sequential.Plasma,
-    "Tritanopia (Blue-Yellow)": px.colors.sequential.Magma
+    "Tritanopia (Blue-Yellow)": px.colors.sequential.Magma,
+    "Color Universal Design (CUD)": ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"],
+    "HCL-based Safe Palette": ["#E64B35", "#4DBBD5", "#00A087", "#F39B7F", "#8491B4", "#91D1C2", "#DC0000", "#7E6148"],
+    "Tol Vibrant": ["#EE7733", "#0077BB", "#33BBEE", "#009988", "#EE3377", "#CC3311", "#BBBBBB"],
+    "Tol Muted": ["#332288", "#88CCEE", "#44AA99", "#117733", "#999933", "#DDCC77", "#CC6677", "#882255", "#AA4499"],
 }
 
+
 # ----------------- Streamlit UI -----------------
-st.title("Canadian Provinces Data Visualization")
+st.title("Population by Provinces")
 st.sidebar.header("Settings")
 
 # Select visualization type
-vis_type = st.sidebar.selectbox("Choose a visualization type:", ["Bar Chart", "Map", "Table"])
+vis_type = st.sidebar.selectbox("Choose a visualization type:", ["Map", "Bar Chart", "Table"])
 
 # Select colorblind-friendly palette
 palette_choice = st.sidebar.selectbox("Choose a colorblind-friendly palette:", list(colorblind_palettes.keys()))
@@ -84,32 +90,57 @@ if vis_type == "Bar Chart":
     st.plotly_chart(fig)
 
 elif vis_type == "Map":
-    # Create a Folium map
-    m = folium.Map(location=[56.1304, -106.3468], zoom_start=4)
+    # Create a Folium map with layer control
+    m = folium.Map(location=[56.1304, -106.3468], zoom_start=4, tiles=None)
+
+    # Add different base layers
+    folium.TileLayer("OpenStreetMap", name="OpenStreetMap").add_to(m)
+    folium.TileLayer("CartoDB positron", name="Light Mode").add_to(m)
+    folium.TileLayer("CartoDB dark_matter", name="Dark Mode").add_to(m)
+    folium.TileLayer("Stamen Terrain", name="Terrain").add_to(m)
+
+    # Enable layer control toggle
+    folium.LayerControl().add_to(m)
 
     # Merge data for coloring the provinces
     canada_map = canada_map.rename(columns={"name": "Province"}).merge(df, on="Province", how="left")
 
-    # Create a color mapping based on population
+    # Apply logarithmic scaling to prevent extreme brightness differences
     min_pop, max_pop = df["Population"].min(), df["Population"].max()
-    colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
+    colormap = folium.LinearColormap(
+        colors=palette_hex,
+        vmin=np.log1p(min_pop),  # Log scale to smooth differences
+        vmax=np.log1p(max_pop)
+    )
 
+    # Function to style each province
+    def style_function(feature):
+        province_name = feature["properties"]["name"]
+        pop = df[df["Province"] == province_name]["Population"].values[0] if province_name in df["Province"].values else None
+        return {
+            "fillColor": colormap(np.log1p(pop)) if pop else "gray",
+            "color": "black",
+            "weight": 1,
+            "fillOpacity": 0.7
+        }
+
+    # Add GeoJson for provinces with interactivity
     for _, row in canada_map.iterrows():
         pop = row["Population"] if pd.notna(row["Population"]) else None
         folium.GeoJson(
             row.geometry,
-            style_function=lambda feature, pop=pop: {
-                "fillColor": colormap(pop) if pop else "gray",
-                "color": "black",
-                "weight": 1,
-                "fillOpacity": 0.7
-            },
+            name=row["Province"],
+            style_function=style_function,
+            highlight_function=lambda x: {"weight": 3, "fillOpacity": 1},  # Hover effect
             tooltip=f"{row['Province']}: {row['Population']:,}" if pop else "No Data",
+            popup=folium.Popup(f"<b>{row['Province']}</b><br>Population: {row['Population']:,}", max_width=200)
         ).add_to(m)
 
-    colormap.caption = "Population Density"
+    # Add legend with the selected colorblind palette
+    colormap.caption = f"Population Density ({palette_choice})"
     m.add_child(colormap)
 
+    # Render the map in Streamlit
     folium_static(m)
 
 elif vis_type == "Table":

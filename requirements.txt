@@ -6,3 +6,5 @@ branca
 streamlit_folium
 geopandas
 matplotlib
+re
+numpy
