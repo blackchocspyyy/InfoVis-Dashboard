@@ -5,6 +5,7 @@ import plotly.express as px
 import folium
 from streamlit_folium import folium_static
 from matplotlib.colors import is_color_like, to_hex, to_rgba
+import re
 
 
 # ----------------- Load Canada Provinces Data -----------------
@@ -53,18 +54,24 @@ palette = colorblind_palettes[palette_choice]
 # Function to ensure colors are properly converted to hex
 def convert_to_hex(color_list):
     hex_colors = []
+    rgb_pattern = re.compile(r"rgb\((\d+),\s*(\d+),\s*(\d+)\)")
+
     for c in color_list:
-        if isinstance(c, tuple):  # If RGB tuple (e.g., (255, 0, 0))
+        if isinstance(c, tuple):  # RGB tuple (255, 0, 0)
             hex_colors.append(to_hex([v / 255 for v in c]))
         elif isinstance(c, str):
-            if c.startswith("#"):  # If it's already a hex string (e.g., #00FF00)
+            if c.startswith("#"):  # Already a hex string
                 hex_colors.append(c)
-            elif is_color_like(c):  # Convert named colors (e.g., "red", "blue") to hex
+            elif rgb_pattern.match(c):  # CSS "rgb(255, 0, 0)" format
+                r, g, b = map(int, rgb_pattern.match(c).groups())
+                hex_colors.append(to_hex([r / 255, g / 255, b / 255]))
+            elif is_color_like(c):  # Convert named colors (e.g., "red", "blue")
                 hex_colors.append(to_hex(to_rgba(c)))
             else:
                 raise ValueError(f"Unexpected color format: {c}")
         else:
             raise ValueError(f"Unexpected color format: {c}")
+
     return hex_colors
 
 # Convert the selected color palette to hex
