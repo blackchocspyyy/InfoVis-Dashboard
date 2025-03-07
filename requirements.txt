@@ -3,3 +3,4 @@ pandas
 plotly
 folium
 branca
+streamlit_folium
