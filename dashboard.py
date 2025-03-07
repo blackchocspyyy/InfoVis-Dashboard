@@ -36,13 +36,10 @@ canada_map = load_canada_map()
 # ----------------- Define Colorblind-Friendly Palettes -----------------
 colorblind_palettes = {
     "Normal Vision": px.colors.qualitative.Set1,
-    "Deuteranopia (Red-Green)": px.colors.sequential.Viridis,
-    "Protanopia (Red-Green)": px.colors.sequential.Plasma,
-    "Tritanopia (Blue-Yellow)": px.colors.sequential.Magma,
-    "Color Universal Design (CUD)": ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"],
-    "HCL-based Safe Palette": ["#E64B35", "#4DBBD5", "#00A087", "#F39B7F", "#8491B4", "#91D1C2", "#DC0000", "#7E6148"],
-    "Tol Vibrant": ["#EE7733", "#0077BB", "#33BBEE", "#009988", "#EE3377", "#CC3311", "#BBBBBB"],
-    "Tol Muted": ["#332288", "#88CCEE", "#44AA99", "#117733", "#999933", "#DDCC77", "#CC6677", "#882255", "#AA4499"],
+    "Deuteranopia: For Red-Green Colorblindness": px.colors.sequential.Viridis,
+    "Tritanopia: For Blue-Yellow Colorblindness": px.colors.sequential.Magma,
+    "Color Universal Design (CUD): For General Colorblindness": ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"],
+    "Tol Muted: Muted/Soft Colors": ["#332288", "#88CCEE", "#44AA99", "#117733", "#999933", "#DDCC77", "#CC6677", "#882255", "#AA4499"],
 }
 
 
