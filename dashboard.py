@@ -50,14 +50,19 @@ vis_type = st.sidebar.selectbox("Choose a visualization type:", ["Bar Chart", "M
 palette_choice = st.sidebar.selectbox("Choose a colorblind-friendly palette:", list(colorblind_palettes.keys()))
 palette = colorblind_palettes[palette_choice]
 
-# Function to handle color conversion (RGB or Hex)
+# Function to ensure colors are properly converted to hex
 def convert_to_hex(color_list):
     hex_colors = []
     for c in color_list:
-        if isinstance(c, tuple):  # If RGB tuple (e.g., (0, 255, 0))
+        if isinstance(c, tuple):  # If RGB tuple (e.g., (255, 0, 0))
             hex_colors.append(to_hex([v / 255 for v in c]))
-        elif isinstance(c, str) and c.startswith("#"):  # If it's already a hex string (e.g., #00FF00)
-            hex_colors.append(c)
+        elif isinstance(c, str):
+            if c.startswith("#"):  # If it's already a hex string (e.g., #00FF00)
+                hex_colors.append(c)
+            elif is_color_like(c):  # Convert named colors (e.g., "red", "blue") to hex
+                hex_colors.append(to_hex(to_rgba(c)))
+            else:
+                raise ValueError(f"Unexpected color format: {c}")
         else:
             raise ValueError(f"Unexpected color format: {c}")
     return hex_colors
