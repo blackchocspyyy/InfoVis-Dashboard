@@ -6,13 +6,6 @@ import folium
 from streamlit_folium import folium_static
 from matplotlib.colors import to_hex
 
-# Convert Plotly color names to hex codes
-palette_hex = [to_hex(px.colors.hex_to_rgb(c)) for c in palette]
-
-# Create a color mapping based on population
-min_pop, max_pop = df["Population"].min(), df["Population"].max()
-colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
-
 
 # ----------------- Load Canada Provinces Data -----------------
 # Sample Data: Population and Coordinates for Canadian Provinces
@@ -56,6 +49,13 @@ vis_type = st.sidebar.selectbox("Choose a visualization type:", ["Bar Chart", "M
 # Select colorblind-friendly palette
 palette_choice = st.sidebar.selectbox("Choose a colorblind-friendly palette:", list(colorblind_palettes.keys()))
 palette = colorblind_palettes[palette_choice]
+
+# Convert Plotly color names to hex codes
+palette_hex = [to_hex(px.colors.hex_to_rgb(c)) for c in palette]
+
+# Create a color mapping based on population
+min_pop, max_pop = df["Population"].min(), df["Population"].max()
+colormap = folium.LinearColormap(colors=palette_hex, vmin=min_pop, vmax=max_pop)
 
 # ----------------- Visualization Logic -----------------
 if vis_type == "Bar Chart":
