@@ -52,7 +52,7 @@ st.sidebar.header("Settings")
 vis_type = st.sidebar.selectbox("Choose a visualization type:", ["Map", "Bar Chart", "Table"])
 
 # Select colorblind-friendly palette
-palette_choice = st.sidebar.selectbox("Choose a colorblind-friendly palette:", list(colorblind_palettes.keys()))
+palette_choice = st.sidebar.selectbox("Choose a colorblind-friendly palette for map:", list(colorblind_palettes.keys()))
 palette = colorblind_palettes[palette_choice]
 
 # Function to ensure colors are properly converted to hex
