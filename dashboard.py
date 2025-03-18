@@ -35,10 +35,9 @@ canada_map = load_canada_map()
 
 # ----------------- Define Colorblind-Friendly Palettes -----------------
 colorblind_palettes = {
-    "Normal Vision (Categorical)": px.colors.qualitative.Set1,  # Bright distinct colors for normal vision users
-    "Color Universal Design (CUD): For General Colorblindness": ["#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7"],  # Colorblind-safe categorical colors
-    "Deuteranopia: For Red-Green Colorblindness": px.colors.sequential.Viridis,  # Blue → Green → Yellow (Best for red-green blindness)
-    "Protanopia: For Red-Green Colorblindness": px.colors.sequential.Cividis,  # Blue → Gray → Yellow (More accessible than Viridis)
+    "Normal Vision (Categorical)": px.colors.sequential.Turbo,  # Bright distinct colors for normal vision users
+    "Color Universal Design (CUD): For General Colorblindness": px.colors.sequential.Inferno,  # High contrast, good for general colorblind accessibility
+    "Deuteranopia & Protanopia: For Red-Green Colorblindness": px.colors.sequential.Cividis,  # Blue → Green → Yellow (Best for red-green blindness)
     "Tritanopia: For Blue-Yellow Colorblindness": px.colors.sequential.Magma,  # Black → Dark Red → Yellow (Good for tritanopia)
     "Soft Contrast: For Accessibility": px.colors.sequential.Plasma,  # Purple → Orange → Yellow (High contrast, readable for all)
 }
