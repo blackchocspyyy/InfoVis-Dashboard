@@ -84,7 +84,6 @@ palette_hex = convert_to_hex(palette)
 # ----------------- Visualization Logic -----------------
 if vis_type == "Bar Chart":
     fig = px.bar(df, x="Province", y="Population", 
-             title="Population by Province", 
              color_discrete_sequence=["#4c72b0"])  # blue shade
     st.plotly_chart(fig)
 
